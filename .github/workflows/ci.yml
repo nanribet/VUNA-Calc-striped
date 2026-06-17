@@ -23,31 +23,34 @@ jobs:
 
       - uses: docker/setup-buildx-action@v3
 
-      - name: Build Docker image
+      - uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push Docker image
         uses: docker/build-push-action@v6
         with:
           context: .
-          push: false
-          tags: vuna-calc:ci
+          push: ${{ github.ref == 'refs/heads/main' }}
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/vuna-calc:latest
+            ${{ secrets.DOCKER_USERNAME }}/vuna-calc:${{ github.sha }}
 
   deploy:
     if: github.ref == 'refs/heads/main'
     needs: ci
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Prepare deploy files
-        run: |
-          mkdir -p deploy
-          cp index.html deploy/
-          cp -r calculator deploy/
-
-      - name: Upload via FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.6
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@v1.2.0
         with:
-          server: ${{ secrets.FTP_HOST }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: deploy/
-          server-dir: public_html/
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            docker pull ${{ secrets.DOCKER_USERNAME }}/vuna-calc:latest
+            docker stop vuna-calc || true
+            docker rm vuna-calc || true
+            docker run -d --name vuna-calc --restart unless-stopped -p 80:80 ${{ secrets.DOCKER_USERNAME }}/vuna-calc:latest
+            docker image prune -f
