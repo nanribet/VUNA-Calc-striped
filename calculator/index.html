@@ -83,10 +83,13 @@
     </div>
   </div>
   <div class="row justify-content-center mt-4">
-    <div class="col-lg-6 col-md-6 col-sm-8">
+    <div class="col-lg-8 col-md-10 col-sm-12">
       <div class="card calculator-card">
         <div class="card-body p-4">
-          <h6 class="text-muted mb-3" style="font-weight: 700; letter-spacing: 1px;">HISTORY (LAST 5)</h6>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h6 style="font-weight: 700; letter-spacing: 1px; color: #6c757d; margin: 0;">CALCULATION HISTORY</h6>
+            <span style="font-size: 0.8rem; color: #adb5bd;" id="history-count"></span>
+          </div>
           <div id="history-list"></div>
         </div>
       </div>

@@ -212,16 +212,19 @@ function escapeHtml(str) {
 
 function renderHistory() {
   const container = document.getElementById("history-list");
+  const countEl = document.getElementById("history-count");
   if (!container) return;
   if (calcHistory.length === 0) {
-    container.innerHTML = "<p class=\"text-muted\" style=\"font-size: 14px;\">No calculations yet.</p>";
+    container.innerHTML = "<p id=\"history-empty\">No calculations yet</p>";
+    if (countEl) countEl.textContent = "";
     return;
   }
   container.innerHTML = calcHistory.map((item) => `
     <div class="history-item show" onclick="useHistoryResult('${item.result.replace(/'/g, "\\'")}')">
-      <div class="history-item-expression">${escapeHtml(item.expression)} = <strong>${escapeHtml(item.result)}</strong></div>
+      <div class="history-item-expression">${escapeHtml(item.expression)}<strong> = ${escapeHtml(item.result)}</strong></div>
     </div>
   `).join("");
+  if (countEl) countEl.textContent = calcHistory.length + " / 5";
 }
 
 function updateResult() {
