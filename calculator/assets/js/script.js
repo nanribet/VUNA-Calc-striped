@@ -4,11 +4,11 @@
 
 let LAST_RESULT = 0;
 var currentExpression = "";
-let history = [];
+let calcHistory = [];
 try {
-  history = JSON.parse(localStorage.getItem("calcHistory") || "[]");
+  calcHistory = JSON.parse(localStorage.getItem("calcHistory") || "[]");
 } catch (e) {
-  history = [];
+  calcHistory = [];
 }
 const MAX_HISTORY = 5;
 
@@ -181,9 +181,9 @@ function calculateResult() {
     result = String(result);
 
     if (result !== "Error") {
-      history.unshift({ expression, result, time: Date.now() });
-      if (history.length > MAX_HISTORY) history.length = MAX_HISTORY;
-      localStorage.setItem("calcHistory", JSON.stringify(history));
+      calcHistory.unshift({ expression, result, time: Date.now() });
+      if (calcHistory.length > MAX_HISTORY) calcHistory.length = MAX_HISTORY;
+      localStorage.setItem("calcHistory", JSON.stringify(calcHistory));
       renderHistory();
     }
 
@@ -213,11 +213,11 @@ function escapeHtml(str) {
 function renderHistory() {
   const container = document.getElementById("history-list");
   if (!container) return;
-  if (history.length === 0) {
-    container.innerHTML = '<p class="text-muted" style="font-size: 14px;">No calculations yet.</p>';
+  if (calcHistory.length === 0) {
+    container.innerHTML = "<p class=\"text-muted\" style=\"font-size: 14px;\">No calculations yet.</p>";
     return;
   }
-  container.innerHTML = history.map((item) => `
+  container.innerHTML = calcHistory.map((item) => `
     <div class="history-item show" onclick="useHistoryResult('${item.result.replace(/'/g, "\\'")}')">
       <div class="history-item-expression">${escapeHtml(item.expression)} = <strong>${escapeHtml(item.result)}</strong></div>
     </div>
